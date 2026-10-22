@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User Progress Rules
+    match /users/{userId}/progress/{progressId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) 
+        && request.resource.data.keys().hasAll(['userId', 'quizScore', 'streakDays'])
+        && request.resource.data.keys().hasOnly(['userId', 'completedCourses', 'quizScore', 'streakDays', 'updatedAt'])
+        && request.resource.data.userId == userId
+        && request.resource.data.quizScore is number
+        && request.resource.data.streakDays is number;
+      allow delete: if isOwner(userId);
+    }
+
+    // User Bookmarks Rules
+    match /users/{userId}/bookmarks/{bookmarkId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['userId', 'noteId', 'title'])
+        && request.resource.data.keys().hasOnly(['userId', 'noteId', 'title', 'createdAt'])
+        && request.resource.data.userId == userId
+        && request.resource.data.noteId is string && request.resource.data.noteId.size() <= 128
+        && request.resource.data.title is string && request.resource.data.title.size() <= 256;
+      allow delete: if isOwner(userId);
+    }
+  }
+}

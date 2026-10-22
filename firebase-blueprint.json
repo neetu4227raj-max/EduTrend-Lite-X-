@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Tracks learner course progress and quiz scores",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "completedCourses": { "type": "array", "items": { "type": "string" } },
+        "quizScore": { "type": "number" },
+        "streakDays": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "quizScore", "streakDays"]
+    },
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "User bookmarked study notes",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "noteId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "noteId", "title"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/progress/{progressId}": {
+      "schema": { "$ref": "#/entities/UserProgress" },
+      "description": "User progress document"
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/Bookmark" },
+      "description": "User bookmarks collection"
+    }
+  }
+}

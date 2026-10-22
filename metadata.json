@@ -1,0 +1,6 @@
+{
+  "name": "EduTrend Lite X",
+  "description": "Elevate learning with AI-powered insights, interactive quizzes, courses, and smart study tools.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
